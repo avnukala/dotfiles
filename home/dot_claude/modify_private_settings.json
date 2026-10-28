@@ -1,0 +1,9 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- /* Keep keys that apps write per machine, such as hooks, and replace the shared keys. */ -}}
+{{- $settings := dict -}}
+{{- if .chezmoi.stdin }}{{ $settings = fromJson .chezmoi.stdin }}{{ end -}}
+{{- $settings = mergeOverwrite $settings (include "dot_claude/.settings.shared.json" | fromJson) -}}
+{{- if .work -}}
+{{-   $settings = mergeOverwrite $settings (include ".work/claude-settings.json.age" | decrypt | fromJson) -}}
+{{- end -}}
+{{ toPrettyJson $settings }}

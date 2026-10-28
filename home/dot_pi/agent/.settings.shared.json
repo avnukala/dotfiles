@@ -1,0 +1,39 @@
+{
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-sonnet-5-5",
+  "modelThinkingLevels": {
+    "anthropic/claude-opus-5-5": "low",
+    "anthropic/claude-sonnet-5-5": "low"
+  },
+  "enabledModels": [
+    "anthropic/claude-fable-5-1",
+    "anthropic/claude-haiku-5-5",
+    "anthropic/claude-opus-5-5",
+    "anthropic/claude-sonnet-5-5"
+  ],
+  "packages": [
+    "npm:pi-web-access",
+    "npm:pi-clear",
+    "npm:@tintinweb/pi-subagents",
+    "npm:pi-context-view",
+    "npm:@howaboua/pi-ask",
+    {
+      "source": "npm:pi-cursor-sdk",
+      "extensions": []
+    }
+  ],
+  "extensions": [
+    "-builtin:mcp"
+  ],
+  "skills": [
+    "!skills/cmux*"
+  ],
+  "theme": "system",
+  "httpIdleTimeoutMs": 45000,
+  "defaultTools": [
+    "+codemode"
+  ],
+  "compaction": {
+    "reserveTokens": 600000
+  }
+}

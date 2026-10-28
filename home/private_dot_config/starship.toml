@@ -1,0 +1,200 @@
+'$schema' = 'https://starship.rs/config-schema.json'
+
+add_newline = false
+palette = 'kanagawa_dragon'
+
+format = """\
+([$username$hostname](fg:orange))\
+[$directory](bold fg:sky)\
+([$git_branch](fg:pink)[$git_state$git_status](fg:orange))\
+([$rust$golang$nodejs$bun$deno$python$java$kotlin$ruby$php$lua$zig$c$elixir$swift$dart$terraform$docker_context$nix_shell$conda](fg:green))\
+([$jobs$cmd_duration](fg:yellow))\
+([$status](fg:red))\
+([$time](fg:muted)) \
+$character"""
+
+# Kanagawa Dragon
+[palettes.kanagawa_dragon]
+# surfaces
+ink     = '#181616'   # dragonBlack3
+shade   = '#282727'   # dragonBlack4
+panel   = '#393836'   # dragonBlack5
+muted   = '#625e5a'   # dragonBlack6
+# text
+fg      = '#c5c9c5'   # dragonWhite
+sand    = '#c8c093'   # oldWhite
+stone   = '#a6a69c'   # dragonGray
+mist    = '#7a8382'   # dragonGray3
+ash     = '#737c73'   # dragonAsh
+# accents
+sky     = '#8ba4b0'   # dragonBlue2
+blue    = '#658594'   # dragonBlue
+violet  = '#8992a7'   # dragonViolet
+teal    = '#949fb5'   # dragonTeal
+aqua    = '#8ea4a2'   # dragonAqua
+green   = '#87a987'   # dragonGreen
+moss    = '#8a9a7b'   # dragonGreen2
+yellow  = '#c4b28a'   # dragonYellow
+orange  = '#b6927b'   # dragonOrange
+clay    = '#b98d7b'   # dragonOrange2
+pink    = '#a292a3'   # dragonPink
+red     = '#c4746e'   # dragonRed
+
+
+# user@host
+[username]
+show_always = false
+format = ' $user'
+
+[hostname]
+ssh_only = true
+trim_at = '.'
+format = '@$hostname'
+
+# current directory
+[directory]
+format = ' $path$read_only'
+read_only = " \U000f033e"
+truncation_length = 3
+truncation_symbol = '…/'
+truncate_to_repo = true
+home_symbol = '~'
+
+[directory.substitutions]
+'Documents' = "\U000f0219 Documents"   # md-file_document
+'Downloads' = "\uf019 Downloads"       # fa-download
+'Music'     = "\U000f075a Music"       # md-music
+'Pictures'  = "\uf03e Pictures"        # fa-picture_o
+
+# git 
+[git_branch]
+symbol = "\ue0a0 "
+format = ' $symbol$branch'
+truncation_length = 28
+truncation_symbol = '…'
+
+[git_state]
+format = ' $state( $progress_current/$progress_total)'
+
+[git_status]
+format = '($all_status$ahead_behind)'
+conflicted = ' =${count}'
+ahead      = ' ⇡${count}'
+behind     = ' ⇣${count}'
+diverged   = ' ⇕⇡${ahead_count}⇣${behind_count}'
+untracked  = ' ?${count}'
+stashed    = ' ≡${count}'
+modified   = ' !${count}'
+staged     = ' +${count}'
+renamed    = ' »${count}'
+deleted    = ' ✘${count}'
+typechanged = ''
+up_to_date = ''
+
+# languages / toolchains
+[rust]
+symbol = "\ue7a8 "   # dev-rust
+format = ' $symbol($version)'
+
+[golang]
+symbol = "\ue626 "   # custom-go
+format = ' $symbol($version)'
+
+[nodejs]
+symbol = "\ue718 "   # dev-nodejs
+format = ' $symbol($version)'
+
+[bun]
+symbol = "\ue76f "   # dev-bun
+format = ' $symbol($version)'
+
+[deno]
+symbol = "\ue628 "   # seti-typescript (deno has no glyph)
+format = ' $symbol($version)'
+
+[java]
+symbol = "\ue256 "   # fae-java
+format = ' $symbol($version)'
+
+[kotlin]
+symbol = "\ue634 "   # seti-kotlin
+format = ' $symbol($version)'
+
+[ruby]
+symbol = "\ue791 "   # dev-ruby
+format = ' $symbol($version)'
+
+[php]
+symbol = "\ue608 "   # seti-php
+format = ' $symbol($version)'
+
+[lua]
+symbol = "\ue620 "   # seti-lua
+format = ' $symbol($version)'
+
+[zig]
+symbol = "\ue6a9 "   # seti-zig
+format = ' $symbol($version)'
+
+[c]
+symbol = "\ue61e "   # custom-c
+format = ' $symbol($version)'
+
+[elixir]
+symbol = "\ue62d "   # seti-elixir
+format = ' $symbol($version)'
+
+[swift]
+symbol = "\ue755 "   # dev-swift
+format = ' $symbol($version)'
+
+[dart]
+symbol = "\ue798 "   # dev-dart
+format = ' $symbol($version)'
+
+[python]
+symbol = "\ue73c "   # dev-python
+format = ' $symbol($version)( \($virtualenv\))'
+
+[terraform]
+symbol = "\U000f1062 " # md-terraform
+format = ' $symbol$workspace'
+
+[docker_context]
+symbol = "\uf308 "   # linux-docker
+format = ' $symbol$context'
+
+[nix_shell]
+symbol = "\uf313 "   # linux-nixos
+format = ' $symbol$state( \($name\))'
+
+[conda]
+symbol = "\uf10c "
+format = ' $symbol$environment'
+
+[jobs]
+symbol = '✦ '
+format = ' $symbol$number'
+
+[cmd_duration]
+min_time = 2000
+format = " \U000f051f $duration"
+
+[status]
+disabled = false
+symbol = '✘ '
+format = ' $symbol$status'
+
+[time]
+disabled = true
+time_format = '%R'
+format = " \U000f0954 $time"
+
+# prompt character
+[character]
+success_symbol            = '[❯](bold green)'
+error_symbol              = '[❯](bold red)'
+vimcmd_symbol             = '[❮](bold violet)'
+vimcmd_replace_one_symbol = '[❮](bold pink)'
+vimcmd_replace_symbol     = '[❮](bold pink)'
+vimcmd_visual_symbol      = '[❮](bold yellow)'

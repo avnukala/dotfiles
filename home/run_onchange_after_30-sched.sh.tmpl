@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Register the launchd jobs in ~/.config/launchd/jobs.
+# bundle {{ include ".work/bundle.tar.age" | sha256sum }}
+{{ range glob (joinPath .chezmoi.sourceDir "private_dot_config/launchd/**/*") -}}
+{{ if not (stat .).isDir -}}
+# {{ base . }} {{ include . | sha256sum }}
+{{ end -}}
+{{ end -}}
+set -eu
+"$HOME/.config/launchd/sched" apply

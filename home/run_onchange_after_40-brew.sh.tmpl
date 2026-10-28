@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Install the Homebrew packages in ~/Brewfile, and in ~/.Brewfile.work on a work Mac.
+# Brewfile {{ include "Brewfile" | sha256sum }}
+{{ if .work -}}
+# bundle {{ include ".work/bundle.tar.age" | sha256sum }}
+{{ end -}}
+set -eu
+brew bundle install --no-upgrade --file "$HOME/Brewfile"
+{{ if .work -}}
+brew bundle install --no-upgrade --file "$HOME/.Brewfile.work"
+{{ end -}}
