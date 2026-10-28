@@ -15,7 +15,7 @@ Shell, editor, terminal, agent, and macOS settings for my Macs. The `dot` script
 
 `dot apply` does these steps, and each step is safe to run again:
 
-1. Link each public file in `files.txt` from `~/<path>` to `home/<path>`. If a live file differs from the repository, `dot` skips it and says so.
+1. Link each public file in `files.txt` from `~/<path>` to `<path>` in this repository. If a live file differs from the repository, `dot` skips it and says so.
 2. On a work Mac, unpack the work bundle into the home directory. Existing files stay as they are.
 3. Write the pi and Claude Code `settings.json` files.
 4. Link the shared skills into each agent with `~/.config/agents/sync-skills.sh`.
@@ -27,7 +27,7 @@ Shell, editor, terminal, agent, and macOS settings for my Macs. The `dot` script
 
 | List | Files | Storage |
 |------|-------|---------|
-| `files.txt` | Public files | As is in `home/`, linked into the home directory |
+| `files.txt` | Public files | As is, at the same path as in the home directory, and linked into it |
 | `~/.config/dotfiles-work/files.txt` | Work files | Encrypted in `work/bundle.tar.age` |
 
 The work list is in the bundle, so the names of the work files are not public.

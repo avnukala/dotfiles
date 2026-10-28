@@ -3,7 +3,6 @@
 set -eu
 
 REPO="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
-SOURCE="$REPO/home"
 PUBLIC_FILES="$REPO/files.txt"
 BUNDLE="$REPO/work/bundle.tar.age"
 KEY="$HOME/.config/age/dotfiles.txt"
@@ -18,7 +17,7 @@ Usage: dot <command>
 
   apply          link, unpack the work bundle, write settings, run brew bundle, and apply macOS settings
   link           link each public file in files.txt into \$HOME
-  add <path>...  copy live files into home/, list them in files.txt, and link them
+  add <path>...  copy live files into this repository, list them in files.txt, and link them
   pack           encrypt the files in $WORK_FILES into work/bundle.tar.age
   prefs          copy the current Rectangle settings into prefs/
 
@@ -36,10 +35,10 @@ link() {
     case "$path" in
       '' | '#'*) continue ;;
     esac
-    source="$SOURCE/$path"
+    source="$REPO/$path"
     target="$HOME/$path"
     if [ ! -e "$source" ]; then
-      echo "skip $target: home/$path is missing"
+      echo "skip $target: $path is missing from the repository"
       continue
     fi
     if [ -L "$target" ] && [ "$(readlink "$target")" = "$source" ]; then continue; fi
@@ -67,10 +66,10 @@ add() {
     esac
     [ -f "$target" ] && [ ! -L "$target" ] || die "$target is not a regular file"
     path="${target#"$HOME"/}"
-    mkdir -p "$(dirname "$SOURCE/$path")"
-    cp -p "$target" "$SOURCE/$path"
+    mkdir -p "$(dirname "$REPO/$path")"
+    cp -p "$target" "$REPO/$path"
     grep -qxF "$path" "$PUBLIC_FILES" || echo "$path" >> "$PUBLIC_FILES"
-    ln -sfn "$SOURCE/$path" "$target"
+    ln -sfn "$REPO/$path" "$target"
     echo "added $target"
   done
 }

@@ -1,4 +1,4 @@
-# Public files. Each path is relative to the home directory. dot links ~/<path> to home/<path>.
+# Public files. Each path is relative to the home directory. dot links ~/<path> to <path> in this repository.
 # The encrypted work files are listed in ~/.config/dotfiles-work/files.txt, which is in the work bundle.
 
 .claude/statusline-command.sh
