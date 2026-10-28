@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-set -eu
-exec "$HOME/.config/config-backup/backup.sh"

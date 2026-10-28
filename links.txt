@@ -1,0 +1,28 @@
+# Public files. Each line is "<repository path> -> <home path>".
+# For a folder, dot links each file in it to the same place in the home folder.
+# The pi and Claude settings.json files are written, not linked. See README.md.
+# The encrypted work files are listed in ~/.config/dotfiles-work/files.txt, which is in the work bundle.
+
+zsh/zshrc -> .zshrc
+zsh/zprofile -> .zprofile
+ghostty -> .config/ghostty
+nvim -> .config/nvim
+starship/starship.toml -> .config/starship.toml
+cmux/cmux.json -> .config/cmux/cmux.json
+cursor/settings.json -> Library/Application Support/Cursor/User/settings.json
+
+launchd/sched -> .config/launchd/sched
+launchd/sched -> .local/bin/sched
+dot -> .local/bin/dot
+
+agents -> .config/agents
+skills -> .config/agents/skills
+
+pi/extensions -> .pi/agent/extensions
+pi/agents -> .pi/agent/agents
+pi/subagents.json -> .pi/agent/subagents.json
+pi/ask.json -> .pi/agent/ask.json
+pi/models.json -> .pi/agent/models.json
+pi/agent-tool-description.md -> .pi/agent/agent-tool-description.md
+
+claude/statusline-command.sh -> .claude/statusline-command.sh
