@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-# Link the shared skills and AGENTS.md into each agent.
-# bundle {{ include ".work/bundle.tar.age" | sha256sum }}
-# skills {{ glob (joinPath .chezmoi.sourceDir "private_dot_config/agents/skills/*") | join " " | sha256sum }}
-set -eu
-"$HOME/.config/agents/sync-skills.sh"

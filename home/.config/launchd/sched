@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+# sched: define launchd agents in jobs/, apply them to this machine.
+#
+# jobs/<name>/job  sets CALENDAR to StartCalendarInterval keys, e.g. CALENDAR="Hour=11 Minute=0",
+#                  with ";" between entries for several times, e.g. CALENDAR="Weekday=1 Hour=9; Weekday=5 Hour=9",
+#                  or INTERVAL to StartInterval seconds, e.g. INTERVAL=900. An INTERVAL job also runs at load.
+# jobs/<name>/run  the executable. It runs from this checkout, so edits apply on the next run.
+#                  A failed run retries after each delay in RETRY_DELAYS, so run must be safe to repeat.
+#
+# sched owns every agent whose label starts with $PREFIX. apply removes the ones not in jobs/.
+set -eu
+shopt -s nullglob
+
+SELF="$(readlink -f "${BASH_SOURCE[0]}")"
+JOBS="$HOME/.config/launchd/jobs"
+PREFIX="com.arijit.nukala.sched."
+DOMAIN="gui/$(id -u)"
+AGENTS="$HOME/Library/LaunchAgents"
+LOGS="$HOME/Library/Logs/sched"
+RETRY_DELAYS=(60 300 900)
+
+die() { echo "sched: $*" >&2; exit 1; }
+
+schedule() {
+  local CALENDAR="" INTERVAL=""
+  source "$JOBS/$1/job"
+  [[ -n "$CALENDAR" || -n "$INTERVAL" ]] || die "$1: job sets neither CALENDAR nor INTERVAL"
+  [[ -z "$CALENDAR" || -z "$INTERVAL" ]] || die "$1: job sets both CALENDAR and INTERVAL"
+  if [[ -n "$INTERVAL" ]]; then echo "INTERVAL=$INTERVAL"; else echo "$CALENDAR"; fi
+}
+
+field() { launchctl print "$DOMAIN/$PREFIX$1" 2>/dev/null | sed -n "s/^[[:space:]]*$2 = //p" | sed "s/(never exited)/-/" | head -1; }
+
+render() {
+  local name="$1" kv
+  [[ -x "$JOBS/$name/run" ]] || die "$name: run is missing or not executable"
+  cat <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>$PREFIX$name</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>$SELF</string>
+    <string>_exec</string>
+    <string>$name</string>
+  </array>
+EOF
+  local when
+  when="$(schedule "$name")"
+  if [[ "$when" == INTERVAL=* ]]; then
+    echo "  <key>StartInterval</key><integer>${when#INTERVAL=}</integer>"
+    echo "  <key>RunAtLoad</key><true/>"
+  else
+    local entries entry indent=""
+    IFS=";" read -ra entries <<<"$when"
+    echo "  <key>StartCalendarInterval</key>"
+    if (( ${#entries[@]} > 1 )); then echo "  <array>"; indent="  "; fi
+    for entry in "${entries[@]}"; do
+      echo "$indent  <dict>"
+      for kv in $entry; do
+        echo "$indent    <key>${kv%%=*}</key><integer>${kv#*=}</integer>"
+      done
+      echo "$indent  </dict>"
+    done
+    if (( ${#entries[@]} > 1 )); then echo "  </array>"; fi
+  fi
+  cat <<EOF
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>StandardOutPath</key><string>$LOGS/$name.log</string>
+  <key>StandardErrorPath</key><string>$LOGS/$name.log</string>
+</dict>
+</plist>
+EOF
+}
+
+cmd_apply() {
+  mkdir -p "$AGENTS" "$LOGS"
+  local dir name plist tmp
+  for dir in "$JOBS"/*/; do
+    name="$(basename "$dir")"
+    plist="$AGENTS/$PREFIX$name.plist"
+    tmp="$(mktemp)"
+    render "$name" >"$tmp"
+    plutil -lint -s "$tmp" || die "$name: rendered plist is invalid"
+    if cmp -s "$tmp" "$plist" && launchctl print "$DOMAIN/$PREFIX$name" >/dev/null 2>&1; then
+      rm "$tmp"
+      echo "$name: unchanged"
+      continue
+    fi
+    launchctl bootout "$DOMAIN/$PREFIX$name" 2>/dev/null || true
+    mv "$tmp" "$plist"
+    launchctl bootstrap "$DOMAIN" "$plist"
+    echo "$name: loaded"
+  done
+
+  for plist in "$AGENTS/$PREFIX"*.plist; do
+    name="$(basename "$plist" .plist)"
+    name="${name#"$PREFIX"}"
+    [[ -d "$JOBS/$name" ]] && continue
+    launchctl bootout "$DOMAIN/$PREFIX$name" 2>/dev/null || true
+    rm "$plist"
+    echo "$name: removed"
+  done
+}
+
+cmd_ls() {
+  local dir name
+  printf '%-20s %-12s %-6s %s\n' NAME STATE EXIT SCHEDULE
+  for dir in "$JOBS"/*/; do
+    name="$(basename "$dir")"
+    printf '%-20s %-12s %-6s %s\n' "$name" "$(field "$name" state || true)" "$(field "$name" 'last exit code' || true)" "$(schedule "$name")"
+  done
+}
+
+cmd_run() {
+  launchctl kickstart "$DOMAIN/$PREFIX$1"
+  echo "$1: started, see: sched log $1"
+}
+
+cmd_log() { tail -n 50 "$LOGS/$1.log"; }
+
+cmd_exec() {
+  local name="$1" code delay
+  for delay in "${RETRY_DELAYS[@]}" ""; do
+    code=0
+    echo "$(date '+%F %T') start"
+    "$JOBS/$name/run" || code=$?
+    echo "$(date '+%F %T') end, exit $code"
+    if (( code == 0 )); then exit 0; fi
+    [[ -n "$delay" ]] || break
+    echo "retry in ${delay}s"
+    sleep "$delay"
+  done
+  osascript -e "display notification \"$name failed with exit $code\" with title \"sched\"" || true
+  exit "$code"
+}
+
+case "${1:-}" in
+  apply) cmd_apply ;;
+  ls) cmd_ls ;;
+  run) cmd_run "${2:?usage: sched run <name>}" ;;
+  log) cmd_log "${2:?usage: sched log <name>}" ;;
+  _exec) cmd_exec "$2" ;;
+  *) echo "usage: sched apply | ls | run <name> | log <name>" >&2; exit 1 ;;
+esac
