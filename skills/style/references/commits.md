@@ -6,6 +6,7 @@ These rules apply to every coding agent: Claude Code, Codex, and Cursor.
 
 - Use the imperative mood. The subject completes "If applied, this commit will ...".
 - Name the change in the smallest accurate plain words.
+- Cut words that add nothing, such as "update", "code", "logic", "changes", "various", and "minor".
 - Capitalize the first word. No final period.
 - Aim for 50 characters. Never exceed 72.
 - No ticket reference (the PR title carries it), type prefix, scope, tag, metadata, or emoji.
@@ -17,11 +18,13 @@ Good: Retry portfolio balance reads without action cutoff
 Bad:  Fixed bug                               past tense, vague
 Bad:  feat(ledger): add freeze                type prefix and scope
 Bad:  PROJ-1153: Add processing errors modal  ticket reference
+Bad:  Update logic to retry the balance reads   filler words
 ```
 
 ## Body
 
 - Add a body only when the subject and the diff cannot carry the reason.
+- Keep the body to 3 lines or fewer. If the reason needs more, it belongs in the PR description.
 - Put one blank line after the subject. Wrap at 72 characters.
 - Explain what was wrong and why this change fixes it. The diff shows how.
 - Write current behavior in the present tense.
@@ -64,7 +67,19 @@ Check again, then push with `git push --force-with-lease`.
 
 1. Read the staged diff. Confirm it follows "Scope of a change" in `code.md`: no format churn, no hunks that change nothing.
 2. Write the subject, and a body only if needed.
-3. Run the agent attribution check.
+3. Show Arijit the staged files and the full message in one block, and ask to commit. Wait for an explicit yes. This also applies to an amend or a rebase that rewrites a message. The watch-pr skill is the only exception.
+4. If Arijit edits the message, use his text as written.
+5. Commit, then run the agent attribution check.
+
+```
+Staged (2 files):
+  dot
+  README.md
+
+Retry portfolio balance reads without action cutoff
+
+Commit with this message? (yes / edit)
+```
 
 ## Basis
 
