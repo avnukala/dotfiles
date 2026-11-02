@@ -38,8 +38,8 @@ code { background: var(--code); border-radius: 6px; padding: 1px 6px; font: 0.88
 a code { color: var(--blue); background: var(--blue-t); }
 mark { background: var(--amber-t); color: inherit; border-radius: 3px; padding: 0 2px; }
 .note { border-left: 3px solid var(--amber); background: var(--amber-t); padding: 8px 14px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 15px; }
-.gym { border-left: 3px solid var(--rule); background: var(--code); padding: 8px 14px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 15px; }
-.gym::before { content: "Gym version: "; font-weight: 600; }
+details { margin: 8px 0; }
+summary { cursor: pointer; font-weight: 600; }
 
 table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 15px; }
 th { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--ink); }
@@ -92,7 +92,19 @@ svg .ok { stroke: var(--green); stroke-width: 2; fill: none; }
 
 <h1>Plain-language title in sentence case</h1>
 
-<p><strong>The invariant, in one sentence.</strong> Then the trick that makes it hold.
+<p><strong>The goal.</strong> What the code is for, in plain words, with no team or domain term.</p>
+
+<h2 id="problem">The problem</h2>
+<p>The obvious way to do the job, then one concrete case where it fails.</p>
+
+<h2 id="blocks">Building blocks</h2>
+<table>
+  <tr><th>Concrete case</th><th>Rule</th><th>Name in the code</th></tr>
+  <tr><td>The worker crashes after it charges the card.</td><td>A job can stop at any line.</td><td>crash</td></tr>
+  <tr><td>The queue sends job 42 again.</td><td>A job that does not confirm it finished runs again.</td><td>retry</td></tr>
+</table>
+
+<p><strong>The invariant, in one sentence.</strong> Then how the code keeps it, using only the building blocks above.
 Legend: <mark>highlighted</mark> is the artifact we follow, <span class="add">green</span> was added at this step, <span class="del">red</span> was dropped.</p>
 
 <table>
@@ -142,7 +154,6 @@ Legend: <mark>highlighted</mark> is the artifact we follow, <span class="add">gr
 <h2 id="s1">1. Hop title &mdash; what this hop means</h2>
 <p class="who"><code>api/orders.py:create_order</code>, runs inside the request.</p>
 <ul><li>In: what goes in.</li><li>Out: what comes out.</li><li>Guarded: what must not break.</li></ul>
-<p class="gym">Optional lifting analogy for the hardest concept. Term first, mapping explicit.</p>
 
 <!-- Code excerpts and payloads sit inline, right under the paragraph that discusses them. Highlight the lines the prose refers to. -->
 <div class="file">
@@ -220,6 +231,9 @@ Legend: <mark>highlighted</mark> is the artifact we follow, <span class="add">gr
 <hr>
 <p><strong>Failure story.</strong> The worst case, and what the degraded mode costs.</p>
 <p><strong>Why local correctness composes.</strong> The one reason the pieces fit together.</p>
+
+<h2 id="check">Check yourself</h2>
+<details><summary>What happens if the worker crashes after the charge?</summary><p>The answer, using only terms from the page.</p></details>
 
 </main>
 

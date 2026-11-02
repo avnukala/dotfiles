@@ -9,7 +9,7 @@ Write the plain, direct version that does the task now, and nothing more.
 - Trust contracts that the repository owns.
 - Keep the control flow flat. Return early.
 - Prefer duplication over the wrong abstraction.
-- Derive data. Do not store it.
+- Derive data. Do not store it, except a denormalized copy that follows "Data and tables".
 - Keep side effects few and at the edges.
 - Prefer readable code over fast code. Optimize only after a measurement.
 - Keep comments rare and load-bearing.
@@ -72,6 +72,18 @@ Write the plain, direct version that does the task now, and nothing more.
 - classes that you create only to call one method
 - loose parameters that always travel together
 - commented-out code
+
+## Data and tables
+
+Capture data and model tables denormalized. Treat a database as facts plus data derived from them. Sources: Kleppmann, "Turning the Database Inside Out", and "Designing Data-Intensive Applications", Part III.
+
+- Capture a fact as one wide, append-only row, as it was when it happened. Copy the values that you need later, such as names, rates, and statuses. Do not join to a mutable row to rebuild the past.
+- Do not overwrite a fact. Write a new row for a change, so that history stays.
+- Model a table for the read that uses it. Put the columns that a query needs in one row. Do not join for them.
+- A denormalized table is derived data. Name its source of truth. A job or a writer must rebuild it from that source, like an index. Never edit it by hand.
+- Keep each rebuild idempotent, so that a replay gives the same rows.
+- Prefer one denormalized table per read over one shared normalized table that every read joins.
+- Normalize only when one value has one owner and must change in every row at once. Say why in a comment.
 
 ## Comments and docstrings
 
@@ -185,7 +197,8 @@ The second version is not less safe. The type owns the shape, an unknown color f
 - Does the diff touch anything that the task does not need?
 - What failures should be loud, and are they?
 - What helpers survived, and does each have a domain reason or three callers?
-- Is any stored value derivable?
+- Is any stored value derivable? If it is a denormalized copy, does it name its source and its rebuild?
+- Does each table capture facts as they were, and serve one read without joins?
 - Does each comment state a fact that the code cannot show?
 - Did the logic change come with its test?
 
