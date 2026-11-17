@@ -88,9 +88,21 @@ Capture data and model tables denormalized. Treat a database as facts plus data 
 ## Comments and docstrings
 
 - Make the code readable without comments. Write no inline comments by default.
-- Comment only a fact that the code cannot show: an invariant, a hazard, a hidden constraint, or surprising behavior. Explain why, not what or how.
-- Keep each comment to one line. Use a short block only when the reason needs more.
+- Comment only a fact that the code cannot show: an invariant, a hazard, a hidden constraint, or a fact about the input data that the code acts on.
+- Write the comment as a short statement of fact, in one line. Lead with the fact, not the story. Good: `# Guard: MySQL Numeric(15, 2) amounts.` Good: `# Freddie writes Eastern time, the column is naive UTC.`
+- Write comments as documentation for later readers. Do not record a design decision, its reason, or its history. That belongs in the PR or the design doc.
 - Never narrate the flow, for example "Step 1: load the user".
+- A field comment gives only the source position, such as `# 412-421`. Add `# enum: <Type>` above a string column that holds a `Literal`, with nothing after it.
+- Do not comment on what a name already says, such as a row-number field.
+- Never put real data in a comment or a test: no real file names, identifiers, servicer numbers, or sample values. Use made-up values of the same shape.
+- Bad comments, each from a real review:
+  - `# Kept as text: samples hold 000, 120, 600, and 840, and the spec gives no unit.` (a decision and samples)
+  - `# 1-9, copied so readers filter without a join` (a reason. Write `# 1-9`.)
+  - `# In 231 real response files, every rate had exactly 4 decimals.` (cites real files)
+  - `# Such as SAT.POSX4900.WR.S198267...` (a real file name)
+  - `# The count ends the line after the label and optional dot leaders.` (how the parser reads it)
+  - `# after SENDER ID` (a source label the field name already shows)
+  - `# enum: FreddieReceiptType. It repeats the ledger file type so the matcher can read one table.` (a reason after the type)
 - Add a docstring for public API and for logic that is not obvious. No long docstring for code that explains itself.
 - Update comments and docstrings in the same change as the code.
 
@@ -101,6 +113,7 @@ Capture data and model tables denormalized. Treat a database as facts plus data 
 - Make arguments keyword-only in public API functions with more than two arguments (not counting `self` or `ctx`), or with two arguments of the same type.
 - Never use a mutable default. Default to `None`, or use `field(default_factory=...)` in a dataclass.
 - Write a module-level function instead of a `@staticmethod`.
+- Refer to enum and `Final` constant values by their own names. Do not add a local alias such as `_TEXT: Final = FormatValues.ALPHANUMERIC_RIGHT_PADDED`.
 
 ```python
 Color = Literal["RED", "BLUE"]

@@ -57,7 +57,7 @@ Example of a ladder for a payment job that is safe to retry:
 8. **Pick the diagrams.** See "Pick the diagram from the hard part". Use the fewest diagrams that carry the story. Most pages need 1 to 3.
 9. **Build the page** from the template.
 10. **Verify.** See "Verify". Fix and look again until every check passes.
-11. **Deliver.** Write the page to `<vault>/workstreams/<workstream>/explainers/<YYYY-MM-DD>-<topic-slug>.html`. If no vault is set, write it to `~/explainers/<YYYY-MM-DD>-<topic-slug>.html`, and create the folder if it is missing. If a page on the same topic exists, overwrite it. Other agents read this folder later, so keep the file self-contained. Open the page and give the user the path.
+11. **Deliver.** Write every page to the notes vault, in the `explainers/` folder of its workstream. Never write a page anywhere else. If no workstream fits, propose a short slug, create its `explainers/` folder, and overwrite any page on the same topic. Keep the file self-contained, because other agents read it later. Open the page and give the user the path.
     - The workstream is the folder whose `brief.md` lists the ticket. If no workstream fits, use a short ad-hoc slug for the area, such as `fannie-gse-reporting`.
     - The topic slug names the subsystem or the PR.
 

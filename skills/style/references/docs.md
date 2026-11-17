@@ -11,6 +11,7 @@ Write all prose in simple English. Follow the `simple-english` skill.
 
 - Write only to pass on information. Explain like a smart product owner to a sharp reader who may not know this area.
 - Do not use a senior engineer voice or try to sound smart.
+- PR text and notes describe. Runbooks and steps instruct.
 - One idea at a time, in plain words. No filler, hedges, praise, or sales words.
 
 ## Sentences and words
