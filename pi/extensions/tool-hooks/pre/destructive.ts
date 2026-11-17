@@ -9,7 +9,12 @@ const DESTRUCTIVE_COMMANDS = [
 ];
 
 const VALON = path.join(homedir(), "valon");
+const TMP = "/tmp";
 const RM_COMMAND = /(?:^|[;&|(]|\s)rm\s+[^;&|]*/g;
+
+function insideTmp(resolved: string): boolean {
+	return resolved.startsWith(TMP + path.sep) || resolved.startsWith("/private" + TMP + path.sep);
+}
 
 function rmOutsideValon(command: string, cwd: string): boolean {
 	for (const match of command.match(RM_COMMAND) ?? []) {
@@ -18,6 +23,7 @@ function rmOutsideValon(command: string, cwd: string): boolean {
 		for (const target of targets) {
 			if (/[$`*?[{]/.test(target.replace(/^~(?=\/)/, ""))) return true;
 			const resolved = path.resolve(cwd, target.replace(/^~(?=$|\/)/, homedir()));
+			if (insideTmp(resolved) && !/[$`]|\.\./.test(target)) continue;
 			if (resolved !== VALON && !resolved.startsWith(VALON + path.sep)) return true;
 		}
 	}
