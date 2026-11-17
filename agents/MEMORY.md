@@ -8,3 +8,4 @@
 - Reply to a PR comment only after its approved change is pushed. State only the decision or fix, on the line. No commit hashes or item numbers. (2026-11-12)
 - Put new checks inside the existing gate block they belong to. (2026-11-16)
 - Do not rewrite pushed git history unless asked. (2026-11-16)
+- Commit messages are one line: the subject only. No body. (2026-11-18, Arijit)

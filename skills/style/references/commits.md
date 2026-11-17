@@ -21,21 +21,16 @@ Bad:  PROJ-1153: Add processing errors modal  ticket reference
 Bad:  Update logic to retry the balance reads   filler words
 ```
 
-## Body
+## One line
 
-- Add a body only when the subject and the diff cannot carry the reason.
-- Keep the body to 3 lines or fewer. If the reason needs more, it belongs in the PR description.
-- Put one blank line after the subject. Wrap at 72 characters.
-- Explain what was wrong and why this change fixes it. The diff shows how.
-- Write current behavior in the present tense.
-- Follow `docs.md`. The checker is optional for a commit body.
+- Write a one-line message: the subject only. This is the default for every commit.
+- Do not add a body. Put the reason in the PR description.
 
 ```
-Retry portfolio balance reads without action cutoff
+Good: Retry portfolio balance reads without action cutoff
+Bad:  Retry portfolio balance reads without action cutoff
 
-Balance reads fail when a portfolio has no action cutoff yet. This
-happens for every portfolio in its first day after onboarding. Retry
-the read without the cutoff, so the first-day balance still loads.
+      Balance reads fail when a portfolio has no action cutoff yet...
 ```
 
 ## Agent attribution
@@ -66,7 +61,7 @@ Check again, then push with `git push --force-with-lease`.
 ## Before you commit
 
 1. Read the staged diff. Confirm it follows "Scope of a change" in `code.md`: no format churn, no hunks that change nothing.
-2. Write the subject, and a body only if needed.
+2. Write the one-line subject. Do not add a body.
 3. Show Arijit the staged files and the full message in one block, and ask to commit. Wait for an explicit yes. This also applies to an amend or a rebase that rewrites a message. The watch-pr skill is the only exception.
 4. If Arijit edits the message, use his text as written.
 5. Commit, then run the agent attribution check.
