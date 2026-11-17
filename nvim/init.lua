@@ -33,6 +33,17 @@ vim.opt.splitbelow = true
 vim.opt.undofile = true
 vim.opt.updatetime = 250
 vim.opt.completeopt = { "menu", "menuone", "noselect", "popup" }
+vim.opt.autoread = true
+
+-- reload clean buffers when pi changes the file on disk
+vim.api.nvim_create_autocmd({ "FocusGained", "TermLeave", "BufEnter", "WinEnter", "CursorHold", "CursorHoldI" }, {
+  group = vim.api.nvim_create_augroup("hotreload", { clear = true }),
+  callback = function()
+    local mode = vim.api.nvim_get_mode().mode
+    if mode:match("[cR!s]") or vim.fn.getcmdwintype() ~= "" then return end
+    vim.cmd("checktime")
+  end,
+})
 
 -- language servers
 local servers = { "rust_analyzer", "ts_ls", "pyright", "html" }
@@ -199,6 +210,20 @@ require("lazy").setup({
     },
   },
 
+  -- diff review of agent edits
+  {
+    "sindrets/diffview.nvim",
+    config = function()
+      require("diffview").setup({
+        keymaps = {
+          view = { { "n", "q", "<cmd>DiffviewClose<cr>", { desc = "Close diffview" } } },
+          file_panel = { { "n", "q", "<cmd>DiffviewClose<cr>", { desc = "Close diffview" } } },
+          file_history_panel = { { "n", "q", "<cmd>DiffviewClose<cr>", { desc = "Close diffview" } } },
+        },
+      })
+    end,
+  },
+
   -- live markdown preview in browser
   {
     "iamcco/markdown-preview.nvim",
@@ -313,6 +338,11 @@ end, s)
 -- git blame
 map("n", "<leader>gb", ":GitBlameToggle<CR>", s)
 map("n", "<leader>go", ":GitBlameOpenCommitURL<CR>", s)
+
+-- diff review (working tree vs HEAD, includes untracked files)
+map("n", "<leader>gv", ":DiffviewOpen HEAD<CR>", s)
+map("n", "<leader>gh", ":DiffviewFileHistory %<CR>", s)
+map("n", "<leader>gq", ":DiffviewClose<CR>", s)
 
 -- markdown preview
 map("n", "<leader>mp", ":MarkdownPreviewToggle<CR>", s)
