@@ -2,6 +2,7 @@ import type { AssistantMessage } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { truncateToWidth } from "@earendil-works/pi-tui";
 import * as path from "node:path";
+import { sessionCost, type SessionCost } from "./lib/cost.ts";
 
 const formatTokens = (n: number) => (n < 1000 ? `${n}` : n < 1_000_000 ? `${(n / 1000).toFixed(1)}k` : `${(n / 1_000_000).toFixed(2)}M`);
 
@@ -26,6 +27,14 @@ export default function (pi: ExtensionAPI) {
 		outputTokens = 0;
 		durationMs = 0;
 
+		let costState: SessionCost = { usd: 0 };
+		const refreshCost = async () => {
+			costState = await sessionCost(pi, ctx);
+		};
+		pi.on("message_end", refreshCost);
+		pi.on("agent_settled", refreshCost);
+		void refreshCost();
+
 		ctx.ui.setFooter((tui, theme, footerData) => {
 			const unsubscribe = footerData.onBranchChange(() => tui.requestRender());
 
@@ -35,7 +44,6 @@ export default function (pi: ExtensionAPI) {
 				render(width: number): string[] {
 					let input = 0;
 					let output = 0;
-					let cost = 0;
 					for (const entry of ctx.sessionManager.getBranch()) {
 						if (entry.type !== "message") continue;
 						// Subagent spend rides on tool results (subagents.json `reportUsage`).
@@ -46,9 +54,9 @@ export default function (pi: ExtensionAPI) {
 						// Anthropic reports cached prompt tokens apart from `input`, so count them as input too.
 						input += usage.input + usage.cacheRead + usage.cacheWrite;
 						output += usage.output;
-						cost += usage.cost.total;
 					}
 
+					const cost = costState;
 					const model = `${ctx.model?.id ?? "no-model"} ${pi.getThinkingLevel()}`;
 					const dir = path.basename(ctx.cwd) || ctx.cwd;
 					const percent = ctx.getContextUsage()?.percent;
@@ -66,7 +74,7 @@ export default function (pi: ExtensionAPI) {
 						theme.fg("dim", `↑${formatTokens(input)}`),
 						theme.fg("dim", `↓${formatTokens(output)}`),
 						theme.fg("dim", tps),
-						theme.fg("warning", `$${cost.toFixed(3)}`),
+						theme.fg("warning", `$${cost.usd.toFixed(3)}`),
 						...statuses,
 					].join(theme.fg("borderMuted", " • "));
 					return [truncateToWidth(line, width)];
